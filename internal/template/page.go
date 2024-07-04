@@ -11,11 +11,11 @@ const (
 	PageFileTemplate = `package %[1]s
 
 import (
-	. "github.com/daarlabs/arcanum/gox"
-	"github.com/daarlabs/arcanum/mirage"
+	. "github.com/daarlabs/hirokit/gox"
+	"github.com/daarlabs/hirokit/hiro"
 )
 
-func %[2]s(c mirage.Ctx) Node {
+func %[2]sPage(c hiro.Ctx) Node {
 	return Div(Text("%[2]s page working!"))
 }
 

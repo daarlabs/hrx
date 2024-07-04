@@ -11,12 +11,12 @@ const (
 	HandlerFileTemplate = `package %[1]s
 
 import (
-	. "github.com/daarlabs/arcanum/gox"
-	"github.com/daarlabs/arcanum/mirage"
+	. "github.com/daarlabs/hirokit/gox"
+	"github.com/daarlabs/hirokit/hiro"
 )
 
-func %[2]s() mirage.Handler {
-	return func(c mirage.Ctx) error {
+func %[2]s() hiro.Handler {
+	return func(c hiro.Ctx) error {
 		return c.Response().Render(
 			Div(Text("%[2]s handler working!")),
 		)
@@ -25,8 +25,8 @@ func %[2]s() mirage.Handler {
 
 `
 	
-	HandlerTemplate = `func %[1]s() mirage.Handler {
-	return func(c mirage.Ctx) error {
+	HandlerTemplate = `func %[1]s() hiro.Handler {
+	return func(c hiro.Ctx) error {
 		return c.Response().Render(
 			Div(Text("%[1]s handler working!")),
 		)

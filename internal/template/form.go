@@ -11,24 +11,24 @@ const (
 	FormFileTemplate = `package %[1]s
 
 import (
-	. "github.com/daarlabs/arcanum/form"
-	"github.com/daarlabs/arcanum/mirage"
+	. "github.com/daarlabs/hirokit/form"
+	"github.com/daarlabs/hirokit/hiro"
 )
 
-type %[2]s struct {
+type %[2]sForm struct {
 	Form
 	Change  Field[string]
 }
 
-func Create%[2]s(c mirage.Ctx) (%[2]s, error) {
+func Create%[2]sForm(c hiro.Ctx) (%[2]sForm, error) {
 	f := c.Create().Form(
 		Add("change").Id("").Label(c.Translate("")).With(Text(), Validate.Required()),
 	)
-	return Build[%[2]s](f)
+	return Build[%[2]sForm](f)
 }
 
-func MustCreate%[2]s(c mirage.Ctx) %[2]s {
-	f, err := Create%[2]s(c)
+func MustCreate%[2]sForm(c hiro.Ctx) %[2]sForm {
+	f, err := Create%[2]sForm(c)
 	if err != nil {
 		panic(err)
 	}
