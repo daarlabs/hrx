@@ -1,11 +1,11 @@
-# Mirage CLI
+# Hirokit CLI
 
 ## Requirements
 - [Go](https://go.dev/) 1.22+
 
 ## Get started
-`go install -v github.com/daarlabs/mrx`
+`go install -v github.com/daarlabs/hrx`
 
 
 ## Cmd
-Run `mrx -h` to see all possibilities
+Run `hrx -h` to see all possibilities
