@@ -5,21 +5,25 @@ const (
 )
 
 const (
-	MainPackage       = "main"
-	MirageHandlerType = "mirage.Handler"
+	MainPackage = "main"
 )
 
 const (
-	Handler   = "Handler"
-	Form      = "Form"
-	Page      = "Page"
-	Component = "Component"
-	Route     = "Route"
+	Component   = "component"
+	Form        = "form"
+	Handler     = "handler"
+	HandlerPage = "handler-page"
+	Migration   = "migration"
+	Page        = "page"
+	Props       = "props"
+	Route       = "route"
 )
 
 const (
-	LowHandler   = "handler"
-	LowForm      = "form"
-	LowPage      = "page"
-	LowComponent = "component"
+	UpperComponent = "Component"
+	UpperForm      = "Form"
+	UpperHandler   = "Handler"
+	UpperPage      = "Page"
+	UpperProps     = "Props"
+	UpperRoute     = "Route"
 )

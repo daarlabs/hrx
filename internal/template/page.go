@@ -15,7 +15,7 @@ import (
 	"github.com/daarlabs/hirokit/hiro"
 )
 
-func %[2]sPage(c hiro.Ctx) Node {
+func %[2]sPage(c hiro.Ctx, props Props) Node {
 	return Div(Text("%[2]s page working!"))
 }
 

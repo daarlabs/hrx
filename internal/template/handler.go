@@ -17,18 +17,25 @@ import (
 
 func %[2]s() hiro.Handler {
 	return func(c hiro.Ctx) error {
+		c.Page().Set().Title("%[2]s")
 		return c.Response().Render(
 			Div(Text("%[2]s handler working!")),
 		)
 	}
 }
-
 `
-	
-	HandlerTemplate = `func %[1]s() hiro.Handler {
+	HandlerPageFileTemplate = `package %[1]s
+
+import (
+	"%[3]s"
+	"github.com/daarlabs/hirokit/hiro"
+)
+
+func %[2]s() hiro.Handler {
 	return func(c hiro.Ctx) error {
+		c.Page().Set().Title("%[5]s")
 		return c.Response().Render(
-			Div(Text("%[1]s handler working!")),
+			%[4]s.%[5]sPage(c, %[4]s.Props{}),
 		)
 	}
 }
@@ -40,8 +47,15 @@ func CreateHandlerFileTemplate(packageName, handlerName string) string {
 	return fmt.Sprintf(HandlerFileTemplate, packageName, handlerName)
 }
 
-func CreateHandlerTemplate(handlerName string, index int) string {
-	handlerName = strings.TrimSuffix(handlerName, model.Handler)
-	handlerName += fmt.Sprintf("%d", index)
-	return "\n" + fmt.Sprintf(HandlerTemplate, handlerName)
+func CreateHandlerPageFileTemplate(handlerInfo, pageInfo model.FileInfo) string {
+	pagePath := strings.TrimPrefix(pageInfo.Dir, handlerInfo.Wd)
+	pagePath = pagePath[strings.Index(pagePath, pageInfo.Module):]
+	return fmt.Sprintf(
+		HandlerPageFileTemplate,
+		handlerInfo.Package,
+		handlerInfo.CamelName,
+		pagePath,
+		pageInfo.Package,
+		pageInfo.CamelName,
+	)
 }

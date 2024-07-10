@@ -32,7 +32,7 @@ func (c *%[2]sComponent) Node() Node {
 )
 
 func CreateComponentFileTemplate(packageName, componentCamelName, componentKebabName string) string {
-	componentCamelName = strings.TrimSuffix(componentCamelName, model.Component)
-	componentKebabName = strings.TrimSuffix(componentKebabName, model.LowComponent)
+	componentCamelName = strings.TrimSuffix(componentCamelName, model.UpperComponent)
+	componentKebabName = strings.TrimSuffix(componentKebabName, model.Component)
 	return fmt.Sprintf(ComponentFileTemplate, packageName, componentCamelName, componentKebabName)
 }

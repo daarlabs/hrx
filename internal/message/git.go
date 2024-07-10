@@ -1,5 +1,5 @@
 package message
 
 const (
-	GitAdded = "Added to git"
+	GitAdded = "added to git"
 )
