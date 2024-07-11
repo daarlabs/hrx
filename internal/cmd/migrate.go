@@ -1,20 +1,19 @@
 package cmd
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
-	"io"
 	"os"
-	"os/exec"
 	"strings"
 	
 	"github.com/spf13/cobra"
 	
+	"github.com/daarlabs/hrx/internal/git"
 	"github.com/daarlabs/hrx/internal/log"
 	"github.com/daarlabs/hrx/internal/message"
 	"github.com/daarlabs/hrx/internal/template"
 	"github.com/daarlabs/hrx/internal/util"
+	"github.com/daarlabs/hrx/internal/workspace"
 )
 
 const (
@@ -27,6 +26,14 @@ var (
 		Aliases: []string{"m"},
 		Short:   "Control migrations",
 		Long:    "",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			_, ok := workspace.DetectWorkspace()
+			if ok {
+				return
+			}
+			log.Error(errors.New(message.InvalidWorkspace))
+			os.Exit(1)
+		},
 	}
 )
 
@@ -57,54 +64,11 @@ var (
 				log.Error(err)
 				os.Exit(1)
 			}
-			migrateUpCmd := exec.Command(
-				"/bin/bash", "-c", strings.Join([]string{"go", "run", wd + "/" + migrationsDir + "/*.go", "--up"}, " "),
+			util.Exec(
+				"/bin/bash",
+				"-c",
+				strings.Join([]string{"go", "run", wd + "/" + migrationsDir + "/*.go", "--up"}, " "),
 			)
-			stdout, err := migrateUpCmd.StdoutPipe()
-			if err != nil {
-				log.Error(err)
-				os.Exit(1)
-			}
-			stderr, err := migrateUpCmd.StderrPipe()
-			if err != nil {
-				log.Error(err)
-				os.Exit(1)
-			}
-			if err := migrateUpCmd.Start(); err != nil {
-				log.Error(err)
-				os.Exit(1)
-			}
-			go func(stdout io.ReadCloser) {
-				defer func(stdout io.ReadCloser) {
-					if err := stdout.Close(); err != nil {
-						log.Error(err)
-						os.Exit(1)
-					}
-				}(stdout)
-				scanner := bufio.NewScanner(stdout)
-				for scanner.Scan() {
-					log.Success(scanner.Text())
-				}
-				if err := scanner.Err(); err != nil {
-					log.Error(err)
-				}
-			}(stdout)
-			go func(stderr io.ReadCloser) {
-				defer func(stderr io.ReadCloser) {
-					if err := stderr.Close(); err != nil {
-						log.Error(err)
-						os.Exit(1)
-					}
-				}(stderr)
-				scanner := bufio.NewScanner(stderr)
-				for scanner.Scan() {
-					log.Error(errors.New(scanner.Text()))
-				}
-			}(stderr)
-			if err := migrateUpCmd.Wait(); err != nil {
-				log.Error(err)
-				os.Exit(1)
-			}
 		},
 	}
 )
@@ -121,54 +85,11 @@ var (
 				log.Error(err)
 				os.Exit(1)
 			}
-			migrateDownCmd := exec.Command(
-				"/bin/bash", "-c", strings.Join([]string{"go", "run", wd + "/" + migrationsDir + "/*.go", "--down"}, " "),
+			util.Exec(
+				"/bin/bash",
+				"-c",
+				strings.Join([]string{"go", "run", wd + "/" + migrationsDir + "/*.go", "--down"}, " "),
 			)
-			stdout, err := migrateDownCmd.StdoutPipe()
-			if err != nil {
-				log.Error(err)
-				os.Exit(1)
-			}
-			stderr, err := migrateDownCmd.StderrPipe()
-			if err != nil {
-				log.Error(err)
-				os.Exit(1)
-			}
-			if err := migrateDownCmd.Start(); err != nil {
-				log.Error(err)
-				os.Exit(1)
-			}
-			go func(stdout io.ReadCloser) {
-				defer func(stdout io.ReadCloser) {
-					if err := stdout.Close(); err != nil {
-						log.Error(err)
-						os.Exit(1)
-					}
-				}(stdout)
-				scanner := bufio.NewScanner(stdout)
-				for scanner.Scan() {
-					log.Success(scanner.Text())
-				}
-				if err := scanner.Err(); err != nil {
-					log.Error(err)
-				}
-			}(stdout)
-			go func(stderr io.ReadCloser) {
-				defer func(stderr io.ReadCloser) {
-					if err := stderr.Close(); err != nil {
-						log.Error(err)
-						os.Exit(1)
-					}
-				}(stderr)
-				scanner := bufio.NewScanner(stderr)
-				for scanner.Scan() {
-					log.Error(errors.New(scanner.Text()))
-				}
-			}(stderr)
-			if err := migrateDownCmd.Wait(); err != nil {
-				log.Error(err)
-				os.Exit(1)
-			}
 		},
 	}
 )
@@ -219,5 +140,5 @@ func initMigrator() error {
 		return err
 	}
 	log.Success(fmt.Sprintf("%s: %s", message.Created, path))
-	return util.GitAdd(path)
+	return git.Add(path)
 }

@@ -4,8 +4,8 @@ import (
 	"os"
 	"strings"
 	
+	"github.com/daarlabs/hrx/internal/git"
 	"github.com/daarlabs/hrx/internal/template"
-	"github.com/daarlabs/hrx/internal/util"
 )
 
 func CreateModule(dir string) (string, error) {
@@ -23,7 +23,7 @@ func CreateModule(dir string) (string, error) {
 	); err != nil {
 		return "", err
 	}
-	return name, util.GitAdd(modulePath)
+	return name, git.Add(modulePath)
 }
 
 func MustCreateModule(dir string) string {

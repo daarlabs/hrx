@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	
 	"github.com/daarlabs/hrx/internal/factory"
+	"github.com/daarlabs/hrx/internal/git"
 	"github.com/daarlabs/hrx/internal/log"
 	"github.com/daarlabs/hrx/internal/message"
 	"github.com/daarlabs/hrx/internal/model"
@@ -28,6 +29,14 @@ var (
 		Aliases: []string{"g"},
 		Short:   "Generate project files",
 		Long:    "",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			_, ok := workspace.DetectWorkspace()
+			if ok {
+				return
+			}
+			log.Error(errors.New(message.InvalidWorkspace))
+			os.Exit(1)
+		},
 	}
 )
 
@@ -231,7 +240,7 @@ func createFile(generateType string, info model.FileInfo) error {
 		return err
 	}
 	log.Success(fmt.Sprintf("%s: %s", message.Created, info.Path))
-	return util.GitAdd(info.Path)
+	return git.Add(info.Path)
 }
 
 func createTemplate(generateType string, info model.FileInfo) string {
