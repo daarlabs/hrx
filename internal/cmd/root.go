@@ -20,6 +20,7 @@ func init() {
 	rootCmd.AddCommand(generateCmd)
 	rootCmd.AddCommand(migrateCmd)
 	rootCmd.AddCommand(newCmd)
+	rootCmd.AddCommand(devCmd)
 }
 
 func Execute() {
