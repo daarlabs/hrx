@@ -56,7 +56,8 @@ var (
 					if !strings.HasSuffix(info.Name(), ".go") &&
 						!strings.HasSuffix(info.Name(), ".yaml") &&
 						!strings.HasSuffix(info.Name(), ".md") &&
-						!strings.HasSuffix(info.Name(), "Tiltfile") {
+						!strings.HasSuffix(info.Name(), "Tiltfile") &&
+						!strings.HasSuffix(info.Name(), "Caddyfile") {
 						return nil
 					}
 					fileBytes, err := os.ReadFile(path)
