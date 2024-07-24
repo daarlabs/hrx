@@ -14,7 +14,7 @@ func main() {
 	m := migrator.New(
 		".",
 		map[string]*esquel.DB{},
-		manager.GetAll(),
+		manager.Collect(),
 	)
 	m.MustRun()
 }
