@@ -2,6 +2,7 @@ package factory
 
 import (
 	"fmt"
+	"strings"
 	"time"
 	
 	"github.com/iancoleman/strcase"
@@ -11,7 +12,7 @@ import (
 	"github.com/daarlabs/hrx/internal/util"
 )
 
-func CreateFileInfo(generateType, wd, inputDir, inputName string) model.FileInfo {
+func CreateFileInfo(generateType, wd, inputDir, inputName string, useDir bool) model.FileInfo {
 	dir := util.NormalizeDir(inputDir)
 	r := model.FileInfo{
 		Wd:        wd,
@@ -34,17 +35,31 @@ func CreateFileInfo(generateType, wd, inputDir, inputName string) model.FileInfo
 			r.Path = r.Dir + "/" + fmt.Sprintf("%d_%s", time.Now().UnixNano(), r.SnakeName) + model.GoExtension
 		}
 	case model.Page:
-		r.Package = r.SnakeName + "_" + generateType
-		r.Dir = wd + "/" + dir + "/" + model.Handler + "/" + inputName + "_" + model.Handler + "/" + inputName + "_" + generateType
+		if !useDir {
+			r.Dir = wd + "/" + dir + "/" + model.Handler + "/" + inputName + "_" + model.Handler + "/" + inputName + "_" + generateType
+		}
+		if useDir {
+			r.Dir = wd + "/" + dir
+		}
 		r.Path = r.Dir + "/" + inputName + "_" + generateType + model.GoExtension
 	case model.Props:
-		r.Package = r.SnakeName + "_" + model.Page
-		r.Dir = wd + "/" + dir + "/" + model.Handler + "/" + inputName + "_" + model.Handler + "/" + inputName + "_" + model.Page
+		if !useDir {
+			r.Dir = wd + "/" + dir + "/" + model.Handler + "/" + inputName + "_" + model.Handler + "/" + inputName + "_" + model.Page
+		}
+		if useDir {
+			r.Dir = wd + "/" + dir
+		}
 		r.Path = r.Dir + "/" + inputName + "_" + model.Page + "_" + generateType + model.GoExtension
 	default:
-		r.Package = r.SnakeName + "_" + generateType
-		r.Dir = wd + "/" + dir + "/" + generateType + "/" + inputName + "_" + generateType
+		if !useDir {
+			r.Dir = wd + "/" + dir + "/" + generateType + "/" + inputName + "_" + generateType
+		}
+		if useDir {
+			r.Dir = wd + "/" + dir
+		}
 		r.Path = r.Dir + "/" + inputName + "_" + generateType + model.GoExtension
 	}
+	dirParts := strings.Split(r.Dir, "/")
+	r.Package = dirParts[len(dirParts)-1]
 	return r
 }

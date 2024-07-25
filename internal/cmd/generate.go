@@ -21,6 +21,7 @@ import (
 
 var (
 	generateName, generateDir, generateApp string
+	useDir                                 bool
 )
 
 var (
@@ -159,8 +160,15 @@ func verifyFlags() {
 		log.Error(errors.New(message.InvalidPath))
 		os.Exit(1)
 	}
-	if len(generateApp) > 0 {
+	if len(generateDir) > 0 {
+		useDir = true
+	}
+	if len(generateApp) > 0 && len(generateDir) == 0 {
 		generateDir = "./app/" + generateApp
+		return
+	}
+	if len(generateApp) > 0 && len(generateDir) > 0 {
+		generateDir = "./app/" + generateApp + "/" + util.NormalizeDir(generateDir)
 	}
 }
 
@@ -173,37 +181,43 @@ func generate(generateType, inputDir, inputName string) error {
 	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
 		return err
 	}
-	if err := ensureModule(dir); err != nil {
-		return err
+	if !useDir {
+		if err := ensureModule(dir); err != nil {
+			return err
+		}
 	}
 	switch generateType {
 	case model.Route:
-		if err := createFile(model.Page, factory.CreateFileInfo(model.Page, wd, inputDir, inputName)); err != nil {
+		if err := createFile(model.Page, factory.CreateFileInfo(model.Page, wd, inputDir, inputName, useDir)); err != nil {
 			return err
 		}
-		if err := createFile(model.Props, factory.CreateFileInfo(model.Props, wd, inputDir, inputName)); err != nil {
+		if err := createFile(
+			model.Props, factory.CreateFileInfo(model.Props, wd, inputDir, inputName, useDir),
+		); err != nil {
 			return err
 		}
 		if err := createFile(
 			model.HandlerPage,
-			factory.CreateFileInfo(model.Handler, wd, inputDir, inputName),
+			factory.CreateFileInfo(model.Handler, wd, inputDir, inputName, useDir),
 		); err != nil {
 			return err
 		}
-		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName))
+		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName, useDir))
 	case model.Handler:
-		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName))
+		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName, useDir))
 	case model.Form:
-		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName))
+		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName, useDir))
 	case model.Page:
-		if err := createFile(model.Props, factory.CreateFileInfo(model.Props, wd, inputDir, inputName)); err != nil {
+		if err := createFile(
+			model.Props, factory.CreateFileInfo(model.Props, wd, inputDir, inputName, useDir),
+		); err != nil {
 			return err
 		}
-		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName))
+		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName, useDir))
 	case model.Component:
-		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName))
+		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName, useDir))
 	case model.Migration:
-		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName))
+		return createFile(generateType, factory.CreateFileInfo(generateType, wd, inputDir, inputName, useDir))
 	default:
 		return errors.New(message.InvalidGenerateType)
 	}
@@ -252,7 +266,7 @@ func createTemplate(generateType string, info model.FileInfo) string {
 	case model.HandlerPage:
 		return template.CreateHandlerPageFileTemplate(
 			info,
-			factory.CreateFileInfo(model.Page, info.Wd, strings.TrimPrefix(info.ModuleDir, info.Wd), info.SnakeName),
+			factory.CreateFileInfo(model.Page, info.Wd, strings.TrimPrefix(info.ModuleDir, info.Wd), info.SnakeName, useDir),
 		)
 	case model.Form:
 		return template.CreateFormFileTemplate(info.Package, info.CamelName)
